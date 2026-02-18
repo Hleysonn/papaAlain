@@ -44,6 +44,76 @@
     toast: document.getElementById("toast"),
   };
 
+  // --- Admin secret (client-side) : simple flow ---
+  // Use the floating 🔒 button to enter the admin code. Default code is `admin_code`.
+  const ADMIN_CODE = "admin_code"; // change as needed
+  function toggleAdminMode() {
+    const isAdmin = document.body.classList.toggle('is-admin');
+    toast(isAdmin ? 'Mode admin activé' : 'Mode admin désactivé');
+  }
+  function tryAdminPrompt() {
+    const code = prompt('Code administrateur :');
+    if (!code) return toast('Opération annulée');
+    if (code.trim().toLowerCase() === ADMIN_CODE.toLowerCase()) toggleAdminMode();
+    else toast('Code incorrect');
+  }
+
+  // Re-enable typed detector for desktop: type the admin code anywhere (outside inputs)
+  function setupTypedAdmin() {
+    let keyBuffer = "";
+    const targetLen = ADMIN_CODE.length;
+    document.addEventListener('keydown', (e) => {
+      const active = document.activeElement;
+      const tag = active && active.tagName && active.tagName.toLowerCase();
+      const isInputish = tag === 'input' || tag === 'textarea' || active.isContentEditable;
+      if (isInputish) return; // ignore typing when inside form fields
+
+      if (e.key === 'Backspace') {
+        keyBuffer = keyBuffer.slice(0, -1);
+        return;
+      }
+
+      if (e.key.length === 1) {
+        keyBuffer += e.key.toLowerCase();
+        if (keyBuffer.length > targetLen) keyBuffer = keyBuffer.slice(-targetLen);
+        if (keyBuffer === ADMIN_CODE.toLowerCase()) {
+          toggleAdminMode();
+          keyBuffer = "";
+        }
+      }
+    });
+  }
+
+  // Mobile-friendly trigger: long-press or 5 rapid taps on the avatar (no visible UI required)
+  function setupAdminTrigger() {
+    const avatar = document.getElementById('avatar') || document.querySelector('.avatar');
+    if (!avatar) return;
+
+    // 5 taps within 2s
+    let taps = 0; let tapTimer = null;
+    avatar.addEventListener('click', (e) => {
+      taps++;
+      if (tapTimer) clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => { taps = 0; }, 2000);
+      if (taps >= 5) {
+        taps = 0;
+        tryAdminPrompt();
+      }
+    });
+
+    // long-press (touch)
+    let touchTimer = null;
+    avatar.addEventListener('touchstart', (e) => {
+      touchTimer = setTimeout(() => { tryAdminPrompt(); }, 700);
+    }, { passive: true });
+    avatar.addEventListener('touchend', (e) => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+  }
+
+  // Mobile / touch-friendly admin trigger: long-press or 5 rapid taps on the avatar
+  // (Removed avatar/tap trigger — using the floating button instead)
+
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -278,6 +348,10 @@
   let state = loadState();
   els.search.value = state.q || "";
   render();
+
+  // enable typed + avatar triggers (no visible UI)
+  setupTypedAdmin();
+  setupAdminTrigger();
 
   // --- Extra UI: confetti, share, print, add-gift modal ---
   function random(min, max) { return Math.random() * (max - min) + min; }

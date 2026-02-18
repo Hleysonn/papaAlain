@@ -10,39 +10,14 @@
 <body>
   <header>
     <div class="hero">
-      <div class="avatar" aria-hidden="true">
-        <svg viewBox="0 0 120 120" width="88" height="88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="g" x1="0" x2="1">
-              <stop offset="0" stop-color="#3ddc97" />
-              <stop offset="1" stop-color="#61a0ff" />
-            </linearGradient>
-          </defs>
-          <rect rx="20" width="120" height="120" fill="url(#g)" />
-          <g fill="#fff" transform="translate(18,20)">
-            <circle cx="42" cy="22" r="18" opacity="0.95" />
-            <rect x="6" y="58" width="72" height="18" rx="9" />
-          </g>
-        </svg>
+      <div id="avatar" class="avatar">
+        <img src="al2.webp" alt="Portrait d'Alain Nkaka" class="avatar-img" width="88" height="88">
       </div>
       <div class="hero-text">
         <h1>🎁 Retraite de M. Alain Nkaka</h1>
         <p class="lead">Merci à tous de célébrer la carrière de M. Alain — choisissez ou proposez un cadeau.</p>
         <!-- <div class="muted-note">Les réservations sont enregistrées localement sur cet appareil (localStorage).</div> -->
-        <div class="announcement" role="note" aria-label="Annonce celebration">
-          <div class="announce-icon" aria-hidden="true">🎉</div>
-          <div class="announce-body">
-            <div class="announce-title">Célébration — Fin de carrière</div>
-            <div class="announce-text">C'est avec une grande joie que je vous invite à célébrer la fin de ma carrière le <strong>20 juin 2026</strong> au <strong>restaurant O'kongo</strong>.</div>
-            <div class="announce-meta">
-              <div class="announce-location"><a href="https://www.google.com/maps/search/?api=1&query=Rue+Fran%C3%A7ois+Libert+25b+1410+Waterloo" target="_blank" rel="noopener">Rue François Libert 25b, 1410 Waterloo</a></div>
-              <!-- <div class="announce-note">Je suis particulièrement enthousiaste de me lancer dans le domaine agricole et la pisciculture.</div> -->
-            </div>
-            <div class="announce-actions">
-              <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Rue+Fran%C3%A7ois+Libert+25b+1410+Waterloo" target="_blank" rel="noopener">Voir sur la carte</a>
-            </div>
-          </div>
-        </div>
+        
       </div>
       <div class="hero-actions">
         <button class="action-btn" id="shareBtn">Partager</button>
@@ -71,7 +46,7 @@
           <button id="showTaken">Déjà pris</button>
         </div>
         <div class="right">
-          <button id="reset" title="Effacer les réservations dans ce navigateur">Réinitialiser</button>
+          <button id="reset" data-action="reset" title="Effacer les réservations dans ce navigateur">Réinitialiser</button>
         </div>
       </div>
     </section>
@@ -100,6 +75,30 @@
             <code id="comm">Ma Pension-Ma nouvelle vie</code>
           </div>
           <button class="btn" data-copy="#comm">Copier</button>
+        </div>
+
+        <div class="announcement" role="note" aria-label="Annonce célébration">
+          <div class="announce-body">
+            <div class="announce-hero-wrap">
+              <img src="al1.webp" alt="Restaurant O'kongo — Rue François Libert 25b, 1410 Waterloo" class="announce-hero" />
+              <span class="announce-ribbon">Célébration</span>
+            </div>
+            <div class="announce-content">
+              <h3 class="announce-title">Fin de carrière</h3>
+              <p class="announce-meta-line">
+                <span class="announce-date">20 juin 2026</span>
+                <span class="announce-dot">·</span>
+                <span class="announce-venue">Restaurant O'kongo</span>
+              </p>
+              <p class="announce-address">
+                <a href="https://www.google.com/maps/search/?api=1&query=Rue+Fran%C3%A7ois+Libert+25b+1410+Waterloo" target="_blank" rel="noopener">Rue François Libert 25b, 1410 Waterloo</a>
+              </p>
+              <p class="announce-text">C'est avec une grande joie que je vous invite à célébrer la fin de ma carrière. Je suis particulièrement enthousiaste de me lancer dans le domaine agricole et la pisciculture.</p>
+              <div class="announce-actions">
+                <a class="btn announce-cta" href="https://www.google.com/maps/search/?api=1&query=Rue+Fran%C3%A7ois+Libert+25b+1410+Waterloo" target="_blank" rel="noopener">Voir sur la carte</a>
+              </div>
+            </div>
+          </div>
         </div>
 
         <p class="small" style="margin-top:12px;">
