@@ -22,6 +22,7 @@ main { max-width: 980px; margin: 0 auto; padding: 18px; display: grid; gap: 16px
   overflow: hidden;
 }
 .card .hd { padding: 14px 14px 0; display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+.gift-note { margin: 8px 14px 0; padding: 0; }
 .card h2 { margin: 0; font-size: 1.05rem; }
 .badge {
   font-size: .78rem; padding: 6px 10px; border-radius: 999px;
@@ -323,6 +324,16 @@ body.is-admin .hero-actions::after {
   transform: translateY(-2px);
 }
 .announce-cta:focus { outline: 2px solid rgba(61,220,151,.4); outline-offset: 2px; }
+
+.announce-quote {
+  margin: 16px 0 0;
+  padding: 12px 0 0 14px;
+  border-left: 3px solid rgba(61,220,151,.4);
+  font-size: .92rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.5;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .announce-cta { transition: none; }
