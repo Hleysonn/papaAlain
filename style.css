@@ -22,7 +22,12 @@ main { max-width: 980px; margin: 0 auto; padding: 18px; display: grid; gap: 16px
   overflow: hidden;
 }
 .card .hd { padding: 14px 14px 0; display:flex; align-items:center; justify-content:space-between; gap: 10px; }
-.gift-note { margin: 8px 14px 0; padding: 0; }
+.gift-note {
+  margin: 0;
+  padding: 10px 14px 0 14px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 .card h2 { margin: 0; font-size: 1.05rem; }
 .badge {
   font-size: .78rem; padding: 6px 10px; border-radius: 999px;
