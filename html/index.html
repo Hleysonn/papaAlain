@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liste de cadeaux – Fin de carrière</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+  <header>
+    <div class="hero">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 120 120" width="88" height="88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0" stop-color="#3ddc97" />
+              <stop offset="1" stop-color="#61a0ff" />
+            </linearGradient>
+          </defs>
+          <rect rx="20" width="120" height="120" fill="url(#g)" />
+          <g fill="#fff" transform="translate(18,20)">
+            <circle cx="42" cy="22" r="18" opacity="0.95" />
+            <rect x="6" y="58" width="72" height="18" rx="9" />
+          </g>
+        </svg>
+      </div>
+      <div class="hero-text">
+        <h1>🎁 Retraite de M. Alain Nkaka</h1>
+        <p class="lead">Merci à tous de célébrer la carrière de M. Alain — choisissez ou proposez un cadeau.</p>
+        <!-- <div class="muted-note">Les réservations sont enregistrées localement sur cet appareil (localStorage).</div> -->
+      </div>
+      <div class="hero-actions">
+        <button class="action-btn" id="shareBtn">Partager</button>
+        <button class="action-btn" id="printBtn">Imprimer</button>
+        <button class="action-btn" id="openAddGift">Proposer un cadeau</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-label="Liste de cadeaux">
+      <div class="hd">
+        <h2>Choisir un cadeau</h2>
+        <span class="badge" id="stats">—</span>
+      </div>
+
+      <div class="content">
+        <ul class="list" id="giftList" aria-live="polite"></ul>
+      </div>
+
+      <div class="toolbar">
+        <div class="left">
+          <input id="search" type="search" placeholder="Rechercher un cadeau… (ex: ordinateur, photo…)" autocomplete="off" />
+          <button id="showAll">Tout</button>
+          <button id="showAvailable">Disponibles</button>
+          <button id="showTaken">Déjà pris</button>
+        </div>
+        <div class="right">
+          <button id="reset" title="Effacer les réservations dans ce navigateur">Réinitialiser</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card" aria-label="Infos virement">
+      <div class="hd">
+        <h2>💶 Option : virement bancaire</h2>
+        <span class="badge">Toujours disponible</span>
+      </div>
+      <div class="content">
+        <p class="note">
+          Vous pouvez aussi faire un versement sur le compte ci-dessous (avec la communication indiquée).
+        </p>
+
+        <div class="copyline">
+          <div>
+            <div class="small">IBAN</div>
+            <code id="iban">BE34 3701 1031 8490</code>
+          </div>
+          <button class="btn" data-copy="#iban">Copier</button>
+        </div>
+
+        <div class="copyline">
+          <div>
+            <div class="small">Communication</div>
+            <code id="comm">Ma Pension-Ma nouvelle vie</code>
+          </div>
+          <button class="btn" data-copy="#comm">Copier</button>
+        </div>
+
+        <p class="small" style="margin-top:12px;">
+          N.B. 3 à 5 personnes peuvent se mettre ensemble pour offrir un cadeau.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Copié ✅</div>
+
+  <!-- Modal : proposer un cadeau -->
+  <div id="addGiftModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-panel" role="document" tabindex="-1">
+      <button class="modal-close" id="closeAddGift" aria-label="Fermer">✕</button>
+      <h3>Proposer un cadeau</h3>
+      <p class="small" style="margin-top:4px;">Votre proposition sera enregistrée localement sur votre appareil et partagée manuellement si vous le souhaitez.</p>
+      <form id="addGiftForm">
+        <label>Nom du cadeau
+          <input id="giftTitle" type="text" required placeholder="Ex: Tablette graphique" autocomplete="off">
+        </label>
+        <label>Description
+          <input id="giftDesc" type="text" placeholder="Courte description (facultatif)" autocomplete="off">
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Ajouter</button>
+          <button type="button" class="btn" id="cancelAddGift">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script src="../js/main.js"></script>
+</body>
+</html>
