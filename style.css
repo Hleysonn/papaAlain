@@ -169,6 +169,29 @@ code {
 .action-btn { border-radius: 12px; padding: 8px 10px; cursor: pointer; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.04); color: var(--text); }
 .action-btn:hover { background: rgba(255,255,255,.08); }
 
+/* Announcement card in hero */
+.announcement {
+  display:flex; gap:12px; align-items:flex-start;
+  margin-top: 10px;
+  background: linear-gradient(90deg, rgba(61,220,151,.04), rgba(97,160,255,.02));
+  border: 1px solid rgba(255,255,255,.06);
+  padding: 12px; border-radius: 12px;
+  color: var(--text); font-size: .98rem; line-height: 1.35;
+}
+.announce-icon { flex: 0 0 44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; border-radius: 10px; background: rgba(255,255,255,.03); }
+.announce-body { flex: 1 1 auto; }
+.announce-title { font-weight:700; margin-bottom:6px; font-size:1rem; }
+.announce-text { color: var(--muted); margin-bottom:8px; }
+.announce-meta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+.announce-location a { color: var(--text); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,.06); padding-bottom:2px; }
+.announce-note { color: var(--muted); font-size:.94rem; }
+.announce-actions { margin-top:6px; }
+.announce-actions .btn { padding:8px 10px; border-radius:10px; font-size:.95rem; }
+
+@media (max-width:900px) {
+  .announcement { flex-direction: row; }
+}
+
 /* Modal */
 .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(2,6,20,0.78); backdrop-filter: blur(4px); z-index: 60; }
 .modal[aria-hidden="false"] { display: flex; }
