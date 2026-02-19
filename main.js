@@ -21,16 +21,27 @@
       id: "chainsaw",
       title: "Tronçonneuse à essence",
       desc: "Pour aider à la gestion de mes terres agricoles."
+    },
+    {
+      id: "tablet",
+      title: "Tablette",
+      desc: "Pour gérer toute la production ( culture, élevage, achats, vente, distribution, dons et aides aux enfants et aux personnes abandonnés de ma future Fondation)."
+    },
+    {
+      id: "pump",
+      title: "Pompe hydrophore",
+      desc: "Pour alimenter en eau les étangs qui seront destinés à l'élevage de poissons."
     }
   ];
 
   /** State shape:
-   * { gifts: { [id]: { taken: boolean, by: string, group: boolean, takenAt: number } }, filter: "all|available|taken", q: string }
+   * { gifts: { [id]: { taken, by, group, takenAt } }, filter, q, customGifts: [{ id, title, desc }, ...] }
    */
   const defaultState = {
     gifts: Object.fromEntries(giftsSeed.map(g => [g.id, { taken:false, by:"", group:false, takenAt:0 }])),
     filter: "all",
-    q: ""
+    q: "",
+    customGifts: []
   };
 
   const els = {
@@ -119,17 +130,21 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return structuredClone(defaultState);
       const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return structuredClone(defaultState);
 
-      // merge safely with defaults (in case you add new gifts later)
-      const merged = structuredClone(defaultState);
-      if (parsed && typeof parsed === "object") {
-        if (parsed.filter) merged.filter = parsed.filter;
-        if (typeof parsed.q === "string") merged.q = parsed.q;
+      const customGifts = Array.isArray(parsed.customGifts) ? parsed.customGifts : [];
+      const allGifts = [...giftsSeed, ...customGifts];
 
-        if (parsed.gifts && typeof parsed.gifts === "object") {
-          for (const id of Object.keys(merged.gifts)) {
-            if (parsed.gifts[id]) merged.gifts[id] = { ...merged.gifts[id], ...parsed.gifts[id] };
-          }
+      const merged = {
+        filter: parsed.filter || "all",
+        q: typeof parsed.q === "string" ? parsed.q : "",
+        customGifts,
+        gifts: Object.fromEntries(allGifts.map(g => [g.id, { taken: false, by: "", group: false, takenAt: 0 }]))
+      };
+
+      if (parsed.gifts && typeof parsed.gifts === "object") {
+        for (const id of Object.keys(parsed.gifts)) {
+          if (merged.gifts[id]) merged.gifts[id] = { ...merged.gifts[id], ...parsed.gifts[id] };
         }
       }
       return merged;
@@ -158,9 +173,17 @@
     }
   }
 
+  function getAllGifts() {
+    return [...giftsSeed, ...(state.customGifts || [])];
+  }
+
+  function isCustomGift(id) {
+    return (state.customGifts || []).some(g => g.id === id);
+  }
+
   function computeVisibleGifts() {
     const q = state.q.trim().toLowerCase();
-    return giftsSeed.filter(g => {
+    return getAllGifts().filter(g => {
       const s = state.gifts[g.id];
       const matchQ = !q || (g.title + " " + g.desc).toLowerCase().includes(q);
       const matchFilter =
@@ -173,8 +196,9 @@
   }
 
   function updateStats() {
-    const total = giftsSeed.length;
-    const taken = giftsSeed.reduce((acc, g) => acc + (state.gifts[g.id].taken ? 1 : 0), 0);
+    const all = getAllGifts();
+    const total = all.length;
+    const taken = all.reduce((acc, g) => acc + (state.gifts[g.id] && state.gifts[g.id].taken ? 1 : 0), 0);
     els.stats.textContent = `${taken}/${total} déjà pris`;
   }
 
@@ -229,6 +253,7 @@
         <div class="actions">
           <button class="btn primary" data-action="reserve" data-id="${g.id}" ${s.taken ? "disabled" : ""}>Réserver</button>
           <button class="btn" data-action="unreserve" data-id="${g.id}" ${s.taken ? "" : "disabled"}>Libérer</button>
+          ${isCustomGift(g.id) ? `<button class="btn danger" data-action="delete" data-id="${g.id}" type="button">Supprimer</button>` : ""}
         </div>
 
         ${s.taken ? `<div class="small">Réservé par <strong>${escapeHtml(s.by || "—")}</strong> • ${fmtDate(s.takenAt)}</div>` : ``}
@@ -237,6 +262,8 @@
       // wire inputs + buttons
       li.querySelector(`[data-action="reserve"]`).addEventListener("click", () => reserveGift(g.id));
       li.querySelector(`[data-action="unreserve"]`).addEventListener("click", () => unreserveGift(g.id));
+      const deleteBtn = li.querySelector(`[data-action="delete"]`);
+      if (deleteBtn) deleteBtn.addEventListener("click", () => deleteGift(g.id));
 
       const byInput = li.querySelector(`#by-${g.id}`);
       const groupInput = li.querySelector(`#group-${g.id}`);
@@ -290,6 +317,20 @@
     toast("Libéré 👌");
   }
 
+  function performDelete(id) {
+    if (!isCustomGift(id)) return;
+    state.customGifts = (state.customGifts || []).filter(g => g.id !== id);
+    delete state.gifts[id];
+    saveState();
+    render();
+    toast("Cadeau supprimé");
+  }
+
+  function deleteGift(id) {
+    if (!isCustomGift(id)) return;
+    showDeleteConfirmModal(true, id);
+  }
+
   function escapeHtml(str) {
     return String(str ?? "").replace(/[&<>\"']/g, (m) => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
@@ -312,12 +353,19 @@
   els.showTaken.addEventListener("click", () => { state.filter = "taken"; saveState(); render(); });
 
   els.reset.addEventListener("click", () => {
-    if (!confirm("Réinitialiser les réservations sur cet appareil ?")) return;
-    state = structuredClone(defaultState);
-    saveState();
+    if (!confirm("Réinitialiser uniquement les réservations ? La liste des cadeaux (y compris ceux proposés) ne sera pas modifiée.")) return;
+    for (const id of Object.keys(state.gifts)) {
+      state.gifts[id].taken = false;
+      state.gifts[id].by = "";
+      state.gifts[id].takenAt = 0;
+      state.gifts[id].group = false;
+    }
+    state.filter = "all";
+    state.q = "";
     els.search.value = "";
+    saveState();
     render();
-    toast("Réinitialisé");
+    toast("Réservations réinitialisées");
   });
 
   // Copy buttons
@@ -468,9 +516,10 @@
       const title = titleEl.value.trim();
       if (!title) return;
       const desc = descEl ? descEl.value.trim() : '';
-      const id = slugify(title) || ('gift-' + Date.now());
-      // append to giftsSeed and state
-      giftsSeed.push({ id, title, desc });
+      let id = slugify(title) || ('gift-' + Date.now());
+      if (state.gifts[id]) id = id + '-' + Date.now();
+      if (!state.customGifts) state.customGifts = [];
+      state.customGifts.push({ id, title, desc });
       state.gifts[id] = { taken: false, by: '', group: false, takenAt: 0 };
       saveState();
       showAddModal(false);
@@ -480,5 +529,53 @@
       toast('Cadeau proposé ✅');
     });
   }
+
+  // Modal confirmation suppression
+  const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+  const closeDeleteConfirm = document.getElementById('closeDeleteConfirm');
+  const cancelDeleteConfirm = document.getElementById('cancelDeleteConfirm');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+  let _pendingDeleteId = null;
+  let _onKeydownDeleteModal = null;
+
+  function showDeleteConfirmModal(show, id) {
+    if (!deleteConfirmModal) return;
+    deleteConfirmModal.setAttribute('aria-hidden', show ? 'false' : 'true');
+    const panel = deleteConfirmModal.querySelector('.modal-panel');
+    if (show && id) {
+      _pendingDeleteId = id;
+      const gift = getAllGifts().find(g => g.id === id);
+      const title = gift ? gift.title : '';
+      if (deleteConfirmMessage) {
+        deleteConfirmMessage.textContent = title
+          ? `« ${title} » sera retiré définitivement de la liste.`
+          : 'Ce cadeau sera retiré définitivement de la liste.';
+      }
+      deleteConfirmModal.addEventListener('click', onDeleteModalClick);
+      _onKeydownDeleteModal = (e) => {
+        if (e.key === 'Escape') { showDeleteConfirmModal(false); }
+      };
+      document.addEventListener('keydown', _onKeydownDeleteModal);
+      setTimeout(() => { if (confirmDeleteBtn) confirmDeleteBtn.focus(); }, 80);
+    } else {
+      _pendingDeleteId = null;
+      deleteConfirmModal.removeEventListener('click', onDeleteModalClick);
+      if (_onKeydownDeleteModal) document.removeEventListener('keydown', _onKeydownDeleteModal);
+      _onKeydownDeleteModal = null;
+    }
+  }
+  function onDeleteModalClick(e) {
+    if (e.target === deleteConfirmModal) showDeleteConfirmModal(false);
+  }
+
+  if (closeDeleteConfirm) closeDeleteConfirm.addEventListener('click', () => showDeleteConfirmModal(false));
+  if (cancelDeleteConfirm) cancelDeleteConfirm.addEventListener('click', () => showDeleteConfirmModal(false));
+  if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', () => {
+    if (_pendingDeleteId) {
+      performDelete(_pendingDeleteId);
+      showDeleteConfirmModal(false);
+    }
+  });
 
 })();

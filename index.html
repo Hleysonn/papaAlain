@@ -131,6 +131,20 @@
     </div>
   </div>
 
+  <!-- Modal : confirmation suppression -->
+  <div id="deleteConfirmModal" class="modal modal--warning" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+    <div class="modal-panel modal-panel--confirm" role="document" tabindex="-1">
+      <button class="modal-close" id="closeDeleteConfirm" aria-label="Fermer">✕</button>
+      <div class="confirm-icon" aria-hidden="true">⚠</div>
+      <h3 id="deleteConfirmTitle" class="confirm-title">Supprimer ce cadeau ?</h3>
+      <p id="deleteConfirmMessage" class="confirm-message">Ce cadeau sera retiré définitivement de la liste.</p>
+      <div class="modal-actions modal-actions--confirm">
+        <button type="button" class="btn" id="cancelDeleteConfirm">Annuler</button>
+        <button type="button" class="btn danger" id="confirmDeleteBtn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
 <script src="main.js"></script>
 </body>
 </html>
